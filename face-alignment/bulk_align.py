@@ -46,7 +46,7 @@ def align_image(image, fa, imname="img", dest="./results/"):
         path = dest
         if not os.path.exists(path):
                 os.makedirs(path)
-        path = path + os.path.splitext(imname)[0] + "_" + str(idx) + ".png"
+        path = path + os.path.splitext(imname)[0] + "_" + str(idx) + ".jpg"
         print("Saving", path)
         cv2.imwrite(path, faceAligned)
 

@@ -20,7 +20,7 @@ for box_in in boxes_in:
         this_box.append(float(pt) * im_resize_ratio)
     boxes.append(this_box)
 
-box_out_fp = open('output_box_file', 'w')
+box_out_fp = open(output_box_file, 'w')
 pickle.dump(boxes, box_out_fp)
 
 print input_box_file, 'saved'

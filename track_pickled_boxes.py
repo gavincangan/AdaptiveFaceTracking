@@ -5,7 +5,14 @@ from os import listdir
 from os.path import isfile, join
 import numpy as np
 
-home_folder = '/home/gavincangan/computerVision/AdaptiveFaceTracking/'
+from cnn_class import Classifier
+
+# home_folder = '/home/gavincangan/computerVision/AdaptiveFaceTracking/'
+home_folder = './'
+
+model_file = "tf/tensorflow-for-poets-2/tf_files/retrained_graph.pb"
+label_file = "tf/tensorflow-for-poets-2/tf_files/retrained_labels.txt"
+cnn_classifier = Classifier(model_file=model_file, label_file=label_file)
 
 box_in_frame_file = home_folder + 'box_in_frame.pick'
 person_in_frame_box_file = home_folder + 'person_in_frame_box.pick'
@@ -38,8 +45,16 @@ def get_face_in_box(this_frame, box):
     return this_frame[box[1]:box[1] + box[3], box[0]:box[0] + box[2], :]
 
 def recognize_person(face_image):
-    print 'Face identified: ', SHELDON
-    return SHELDON
+    (label, score) = cnn_classifier.run_data(face_image)
+    result = INVALID
+    if label == "sheldon":
+        result = SHELDON
+    elif label == "leonard":
+        result = LEONARD
+    elif label == "penny":
+        result = PENNY
+    print 'Face identified: ', label, score, result
+    return result
 
 def get_frame(frame_num):
     frame_filename = frames_folder + '/' + "%05d.jpg" % frame_num
@@ -52,7 +67,7 @@ def round_it_up(float_box):
         round_box.append(int(round(this_point)))
     return tuple(round_box)
 
-def track_faces():
+def track_faces(frame_limit=-1):
     for this_face in faces:
         print 'Tracker init - face: ', this_face
         mf_tracker = cv2.TrackerMedianFlow_create()
@@ -72,6 +87,8 @@ def track_faces():
         next_frame_img = get_frame(next_frame_num)
         print 'Now: ', this_frame_num, 'Next: ', next_frame_num
         # print this_frame.shape
+        if (frame_limit > 0 and this_frame_num >= frame_limit):
+            break
 
         this_frame_boxes = box_in_frame[this_frame_num]
         for this_box in this_frame_boxes:
@@ -109,6 +126,7 @@ def track_faces():
         # while not (next_frame_num in box_in_frame.keys()):
         #     next_frame_num += 1
 
+    print "Saving data"
     pickle.dump(person_in_frame_box, person_in_frame_box_fp)
     pickle.dump(tracked_next_frame_box, tracked_next_frame_box_fp)
 
@@ -142,5 +160,5 @@ def collect_boxes_in_frames():
 
 if __name__ == '__main__':
     # collect_boxes_in_frames()
-    track_faces()
+    track_faces(100)
 

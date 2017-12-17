@@ -8,7 +8,7 @@ import numpy as np
 from cnn_class import Classifier
 
 # home_folder = '/home/gavincangan/computerVision/AdaptiveFaceTracking/'
-home_folder = './test/'
+home_folder = './'
 
 model_file = "tf/tensorflow-for-poets-2/tf_files/retrained_graph.pb"
 label_file = "tf/tensorflow-for-poets-2/tf_files/retrained_labels.txt"
@@ -57,7 +57,7 @@ def get_name_string(person_id):
         return "Sheldon"
 
 def get_face_in_box(this_frame, box):
-    print 'Get face in box ', box
+    # print 'Get face in box ', box
     return this_frame[box[1]:box[1] + box[3], box[0]:box[0] + box[2], :]
 
 
@@ -110,7 +110,7 @@ def track_faces(frame_limit=-1):
     while this_frame_num <= end_frame_num:
         this_frame_img = get_frame(this_frame_num)
         next_frame_img = get_frame(next_frame_num)
-        print 'Now: ', this_frame_num, 'Next: ', next_frame_num
+        # print 'Now: ', this_frame_num, 'Next: ', next_frame_num
         # print this_frame.shape
         if (frame_limit > 0 and this_frame_num >= frame_limit):
             break
@@ -171,9 +171,11 @@ def imwrite_output(frame_limit=-1):
         end_frame_num = start_frame_num + frame_limit
 
     for this_frame_num in range(start_frame_num, end_frame_num):
+        print this_frame_num,
         this_frame_img = get_frame(this_frame_num)
         for this_person in faces:
             if (this_frame_num,this_person) in tracked_next_frame_box.keys():
+                print this_person,
                 this_box = tracked_next_frame_box.get((this_frame_num,this_person))
                 [this_pt1, this_pt2] = get_pts_in_box(this_box)
                 cv2.rectangle(this_frame_img, this_pt1, this_pt2, personColors[this_person - 1])
@@ -181,7 +183,7 @@ def imwrite_output(frame_limit=-1):
 
         frame_filename = output_frames_folder + '/' + "%05d.jpg" % this_frame_num
         cv2.imwrite(frame_filename, this_frame_img)
-
+        print ''
 
 def collect_boxes_in_frames():
     count = 0
@@ -209,6 +211,6 @@ def collect_boxes_in_frames():
 
 if __name__ == '__main__':
     # collect_boxes_in_frames()
-    track_faces(100)
-    imwrite_output(19)
+    track_faces(500)
+    imwrite_output(500)
 

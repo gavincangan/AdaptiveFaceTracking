@@ -8,7 +8,7 @@ import numpy as np
 from cnn_class import Classifier
 
 # home_folder = '/home/gavincangan/computerVision/AdaptiveFaceTracking/'
-home_folder = './'
+home_folder = './test/'
 
 model_file = "tf/tensorflow-for-poets-2/tf_files/retrained_graph.pb"
 label_file = "tf/tensorflow-for-poets-2/tf_files/retrained_labels.txt"
@@ -68,6 +68,10 @@ def round_it_up(float_box):
     return tuple(round_box)
 
 def track_faces(frame_limit=-1):
+    global end_frame_num
+    if frame_limit is not -1:
+        end_frame_num = start_frame_num + frame_limit
+
     for this_face in faces:
         print 'Tracker init - face: ', this_face
         mf_tracker = cv2.TrackerMedianFlow_create()
@@ -106,14 +110,19 @@ def track_faces(frame_limit=-1):
                 [success, next_box] = face_tracker[this_person].update(next_frame_img)
                 if success:
                     next_box = round_it_up(next_box)
-                    next_face = get_face_in_box(next_frame_img, next_box)
-                    next_person = recognize_person(next_face)
-                    if this_person is not INVALID:
-                        tracked_next_frame_box[(next_frame_num, next_person)] = next_box
-                        person_in_frame_box[(next_frame_num, next_box)] = next_person
-                        print 'Tracker - Frame: ', next_frame_num, '  Person: ', next_person
-                    else:
-                        continue
+                    # next_face = get_face_in_box(next_frame_img, next_box)
+                    # next_person = recognize_person(next_face)
+                    # if this_person is not INVALID:
+                    #     tracked_next_frame_box[(next_frame_num, next_person)] = next_box
+                    #     person_in_frame_box[(next_frame_num, next_box)] = next_person
+                    #     print 'Tracker - Frame: ', next_frame_num, '  Person: ', next_person
+                    # else:
+                    #     continue
+
+                    # # No need to call face recognition every time.
+                    # # Only if tracker fails
+                    tracked_next_frame_box[(next_frame_num, this_person)] = next_box
+                    person_in_frame_box[(next_frame_num, next_box)] = this_person
                 else:
                     continue
             else:

@@ -23,11 +23,18 @@ person_in_frame_box_fp = open(person_in_frame_box_file, 'r+b')
 tracked_next_frame_box_fp = open(tracked_next_frame_box_file, 'r+b')
 
 box_in_frame = pickle.load(box_in_frame_fp)
-person_in_frame_box = dict() #pickle.load(person_in_frame_box_fp)
-tracked_next_frame_box = dict() #pickle.load(tracked_next_frame_box_fp)
+person_in_frame_box = pickle.load(person_in_frame_box_fp)
+tracked_next_frame_box = pickle.load(tracked_next_frame_box_fp)
 
 frames_folder = home_folder + 'frames'
 boxes_folder = home_folder + 'pickled_boxes'
+output_frames_folder = home_folder + 'output_frames'
+
+font = cv2.FONT_HERSHEY_SIMPLEX
+bottomLeftCornerOfText = (10,500)
+fontScale = 1
+lineType = 2
+personColors = ((255, 0, 0), (0, 255, 0), (0, 0, 255))
 
 INVALID = -1
 LEONARD = 1
@@ -40,9 +47,23 @@ face_tracker = dict()
 start_frame_num = 80
 end_frame_num = 24499
 
+
+def get_name_string(person_id):
+    if person_id == 1:
+        return "Leonard"
+    elif person_id == 2:
+        return "Penny"
+    elif person_id == 3:
+        return "Sheldon"
+
 def get_face_in_box(this_frame, box):
-    print 'Get face in box ', box
+    # print 'Get face in box ', box
     return this_frame[box[1]:box[1] + box[3], box[0]:box[0] + box[2], :]
+
+
+def get_pts_in_box(box):
+    return (box[0], box[1]), (box[0] + box[2], box[1] + box[3])
+
 
 def recognize_person(face_image):
     (label, score) = cnn_classifier.run_data(face_image)
@@ -68,8 +89,12 @@ def round_it_up(float_box):
     return tuple(round_box)
 
 def track_faces(frame_limit=-1):
+    global end_frame_num
+    if frame_limit is not -1:
+        end_frame_num = start_frame_num + frame_limit
+
     for this_face in faces:
-        print 'Tracker init - face: ', this_face
+        # print 'Tracker init - face: ', this_face
         mf_tracker = cv2.TrackerMedianFlow_create()
         face_tracker[this_face] = mf_tracker
 
@@ -85,7 +110,7 @@ def track_faces(frame_limit=-1):
     while this_frame_num <= end_frame_num:
         this_frame_img = get_frame(this_frame_num)
         next_frame_img = get_frame(next_frame_num)
-        print 'Now: ', this_frame_num, 'Next: ', next_frame_num
+        # print 'Now: ', this_frame_num, 'Next: ', next_frame_num
         # print this_frame.shape
         if (frame_limit > 0 and this_frame_num >= frame_limit):
             break
@@ -106,14 +131,19 @@ def track_faces(frame_limit=-1):
                 [success, next_box] = face_tracker[this_person].update(next_frame_img)
                 if success:
                     next_box = round_it_up(next_box)
-                    next_face = get_face_in_box(next_frame_img, next_box)
-                    next_person = recognize_person(next_face)
-                    if this_person is not INVALID:
-                        tracked_next_frame_box[(next_frame_num, next_person)] = next_box
-                        person_in_frame_box[(next_frame_num, next_box)] = next_person
-                        print 'Tracker - Frame: ', next_frame_num, '  Person: ', next_person
-                    else:
-                        continue
+                    # next_face = get_face_in_box(next_frame_img, next_box)
+                    # next_person = recognize_person(next_face)
+                    # if this_person is not INVALID:
+                    #     tracked_next_frame_box[(next_frame_num, next_person)] = next_box
+                    #     person_in_frame_box[(next_frame_num, next_box)] = next_person
+                    #     print 'Tracker - Frame: ', next_frame_num, '  Person: ', next_person
+                    # else:
+                    #     continue
+
+                    # # No need to call face recognition every time.
+                    # # Only if tracker fails
+                    tracked_next_frame_box[(next_frame_num, this_person)] = next_box
+                    person_in_frame_box[(next_frame_num, next_box)] = this_person
                 else:
                     continue
             else:
@@ -123,6 +153,7 @@ def track_faces(frame_limit=-1):
         while this_frame_num not in box_in_frame.keys() and this_frame_num < end_frame_num:
             this_frame_num += 1
         next_frame_num = this_frame_num + 1
+
         # while not (next_frame_num in box_in_frame.keys()):
         #     next_frame_num += 1
 
@@ -133,6 +164,26 @@ def track_faces(frame_limit=-1):
     person_in_frame_box_fp.close()
     tracked_next_frame_box_fp.close()
 
+
+def imwrite_output(frame_limit=-1):
+    global end_frame_num
+    if frame_limit is not -1:
+        end_frame_num = start_frame_num + frame_limit
+
+    for this_frame_num in range(start_frame_num, end_frame_num):
+        print this_frame_num,
+        this_frame_img = get_frame(this_frame_num)
+        for this_person in faces:
+            if (this_frame_num,this_person) in tracked_next_frame_box.keys():
+                print this_person,
+                this_box = tracked_next_frame_box.get((this_frame_num,this_person))
+                [this_pt1, this_pt2] = get_pts_in_box(this_box)
+                cv2.rectangle(this_frame_img, this_pt1, this_pt2, personColors[this_person - 1])
+                cv2.putText(this_frame_img, get_name_string(this_person), this_pt1, font, fontScale, personColors[this_person - 1], lineType)
+
+        frame_filename = output_frames_folder + '/' + "%05d.jpg" % this_frame_num
+        cv2.imwrite(frame_filename, this_frame_img)
+        print ''
 
 def collect_boxes_in_frames():
     count = 0
@@ -160,5 +211,6 @@ def collect_boxes_in_frames():
 
 if __name__ == '__main__':
     # collect_boxes_in_frames()
-    track_faces(100)
+    track_faces(500)
+    imwrite_output(500)
 

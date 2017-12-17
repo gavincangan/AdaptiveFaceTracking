@@ -94,7 +94,7 @@ def track_faces(frame_limit=-1):
         end_frame_num = start_frame_num + frame_limit
 
     for this_face in faces:
-        print 'Tracker init - face: ', this_face
+        # print 'Tracker init - face: ', this_face
         mf_tracker = cv2.TrackerMedianFlow_create()
         face_tracker[this_face] = mf_tracker
 
@@ -150,11 +150,8 @@ def track_faces(frame_limit=-1):
                 continue
 
         this_frame_num += 1
-
-         # # No need to skip frames.
-         # while this_frame_num not in box_in_frame.keys() and this_frame_num < end_frame_num:
-         #     this_frame_num += 1
-
+        while this_frame_num not in box_in_frame.keys() and this_frame_num < end_frame_num:
+            this_frame_num += 1
         next_frame_num = this_frame_num + 1
 
         # while not (next_frame_num in box_in_frame.keys()):

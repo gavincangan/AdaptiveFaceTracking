@@ -65,7 +65,7 @@ for imfile in onlyimages:
     rects = face_cascade.detectMultiScale(gray,
             scaleFactor=1.1,
             minNeighbors=5,
-            minSize=(30, 30),
+            minSize=(10, 10),
             flags = (cv2.CASCADE_SCALE_IMAGE +
                 cv2.CASCADE_DO_CANNY_PRUNING +
                 cv2.CASCADE_FIND_BIGGEST_OBJECT +
@@ -92,7 +92,7 @@ for imfile in onlyimages:
     rects = profile_cascade.detectMultiScale(gray,
             scaleFactor=1.1,
             minNeighbors=5,
-            minSize=(30, 30),
+            minSize=(10, 10),
             flags = (cv2.CASCADE_SCALE_IMAGE +
                 cv2.CASCADE_DO_CANNY_PRUNING +
                 cv2.CASCADE_FIND_BIGGEST_OBJECT +

@@ -30,16 +30,18 @@ def align_image(image, fa, imname="img", dest="./results/"):
         # extract the ROI of the *original* face, then align the face
         # using facial landmarks
         (x, y, w, h) = rect_to_bb(rect)
-        if (w < 10 or h < 0):
-            print('Skipping', imname)
-            continue
-        try:
-            faceOrig = imutils.resize(image[y:y + h, x:x + w], width=256)
-            faceAligned = fa.align(image, gray, rect)
-        except:
-            print('Skipping', imname)
-            continue
+        # if (w < 0 or h < 0):
+        #     print('Skipping', imname)
+        #     continue
+        # try:
+        #     faceOrig = imutils.resize(image[y:y + h, x:x + w], width=256)
+        #     faceAligned = fa.align(image, gray, rect)
+        # except:
+        #     print('Skipping', imname)
+        #     continue
 
+        print(w,'x',h)
+        faceAligned = imutils.resize(image[y:y + h, x:x + w], width=256)
         # import uuid
         # f = str(uuid.uuid4())
         # path = "./results/" + os.path.splitext(imname)[0] + "/" # + str(idx) + ".png"

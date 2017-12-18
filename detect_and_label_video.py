@@ -132,9 +132,9 @@ while True:
         # cv2.imshow('image', image)
         # cv2.imshow('face', face)
         [this_pt1, this_pt2] = get_pts_in_box((x, y, w, h))
-        cv2.rectangle(image, this_pt1, this_pt2, (0,0,128))
+        cv2.rectangle(image, this_pt1, this_pt2, (0,255,255))
         cv2.putText(image, label, this_pt1, font, fontScale,
-                (0,0,128), lineType)
+                (0,255,255), lineType)
 
 
     for idx, rect in enumerate(profile_faces):
@@ -151,9 +151,9 @@ while True:
         # cv2.imshow('image', image)
         # cv2.imshow('face', face)
         [this_pt1, this_pt2] = get_pts_in_box((x, y, w, h))
-        cv2.rectangle(image, this_pt1, this_pt2, (0,128,0))
+        cv2.rectangle(image, this_pt1, this_pt2, (0,255,0))
         cv2.putText(image, label, this_pt1, font, fontScale,
-                (0,128,0), lineType)
+                (0,255,0), lineType)
 
 
     # cv2.imshow('image', image)
@@ -161,6 +161,6 @@ while True:
     print('saving', cur_frame);
     cv2.imwrite('video_out/'+str(cur_frame)+'.jpg', image)
     cur_frame += 1
-    if (cur_frame > 1000):
+    if (cur_frame > 150):
         break
 

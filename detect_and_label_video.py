@@ -18,6 +18,9 @@ lineType = 2
 face_cascade = cv2.CascadeClassifier('data/haarcascade_frontalface_alt2.xml')
 profile_cascade = cv2.CascadeClassifier('data/haarcascade_profileface.xml')
 
+frontal_face_dir = './face_images/front_'
+side_profile_face_dir = './face_images/prof_'
+
 def rect_to_bb(rect):
     # take a bounding predicted by dlib and convert it
     # to the format (x, y, w, h) as we would normally do
@@ -134,6 +137,7 @@ while True:
         w = rect[2]
         h = rect[3]
         face = image[y:y + h, x:x + w]
+        cv2.imwrite(frontal_face_dir + str(cur_frame) + str(idx) + '.jpg', face)
         (label, score) = cnn_classifier.run_data(face)
         # print(label, score)
         # cv2.imshow('image', image)
@@ -153,6 +157,7 @@ while True:
         w = rect[2]
         h = rect[3]
         face = image[y:y + h, x:x + w]
+        cv2.imwrite(side_profile_face_dir + str(cur_frame)  + str(idx) + '.jpg', face)
         (label, score) = cnn_classifier.run_data(face)
         # print(label, score)
         # cv2.imshow('image', image)
@@ -168,6 +173,6 @@ while True:
     print('saving', cur_frame);
     cv2.imwrite('video_out/'+str(cur_frame)+'.jpg', image)
     cur_frame += 1
-    if (cur_frame > 150):
+    if (cur_frame > 2000):
         break
 

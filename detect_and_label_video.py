@@ -51,6 +51,13 @@ def scale_rect(rect, scale):
     # print(border)
     new_rect = [rect[0]-border, rect[1]-border, rect[2]+2*border, rect[3]+2*border]
     # print(new_rect)
+    box_oor = False
+    for pt in new_rect:
+        if(pt < 0 or pt > 800):
+            box_oor = True
+    # print(new_rect)
+    if box_oor:
+        new_rect = rect
     return new_rect
 
 ap = argparse.ArgumentParser()

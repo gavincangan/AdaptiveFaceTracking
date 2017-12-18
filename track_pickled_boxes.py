@@ -34,14 +34,29 @@ font = cv2.FONT_HERSHEY_SIMPLEX
 bottomLeftCornerOfText = (10,500)
 fontScale = 1
 lineType = 2
-personColors = ((255, 0, 0), (0, 255, 0), (0, 0, 255))
+personColors = ((128, 0, 0),
+        (0, 128, 0),
+        (128, 128, 0),
+        (0, 0, 128),
+        (128, 0, 128),
+        (0, 128, 128),
+        (128, 128, 128),
+        (255, 0, 0),
+        (0, 255, 0),
+        (255, 255, 0),
+        (0, 0, 255),
+        (255, 0, 255))
 
 INVALID = -1
 LEONARD = 1
 PENNY = 2
 SHELDON = 3
+HOWARD = 4
+RAJ = 5
+BERNADETTE = 6
+AMY = 7
 
-faces = [SHELDON, LEONARD, PENNY]
+faces = [LEONARD, PENNY, SHELDON, HOWARD, RAJ, BERNADETTE, AMY]
 face_tracker = dict()
 
 start_frame_num = 80
@@ -49,12 +64,44 @@ end_frame_num = 24499
 
 
 def get_name_string(person_id):
-    if person_id == 1:
-        return "Leonard"
-    elif person_id == 2:
-        return "Penny"
-    elif person_id == 3:
-        return "Sheldon"
+    if person_id == LEONARD:
+        return "leonard"
+    elif person_id == PENNY:
+        return "penny"
+    elif person_id == SHELDON:
+        return "sheldon"
+    elif person_id == HOWARD:
+        return "howard"
+    elif person_id == RAJ:
+        return "raj"
+    elif person_id == BERNADETTE:
+        return "bernadette"
+    elif person_id == AMY:
+        return "amy"
+    elif person_id == INVALID:
+        return "invalid"
+    else:
+        raise ValueError('person_id not found')
+
+def get_name_id(person_name):
+    if person_name == "leonard":
+        return LEONARD
+    elif person_name == "penny":
+        return PENNY
+    elif person_name == "sheldon":
+        return SHELDON
+    elif person_name == "howard":
+        return HOWARD
+    elif person_name == "raj":
+        return RAJ
+    elif person_name == "bernadette":
+        return BERNADETTE
+    elif person_name == "amy":
+        return AMY
+    elif person_name == "invalid":
+        return INVALID
+    else:
+        raise ValueError('person_name not found')
 
 def get_face_in_box(this_frame, box):
     # print 'Get face in box ', box
@@ -67,14 +114,8 @@ def get_pts_in_box(box):
 
 def recognize_person(face_image):
     (label, score) = cnn_classifier.run_data(face_image)
-    result = INVALID
-    if label == "sheldon":
-        result = SHELDON
-    elif label == "leonard":
-        result = LEONARD
-    elif label == "penny":
-        result = PENNY
-    print 'Face identified: ', label, score, result
+    result = get_name_id(label)
+    # print 'Face identified: ', label, score, result
     return result
 
 def get_frame(frame_num):

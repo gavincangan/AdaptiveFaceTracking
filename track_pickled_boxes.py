@@ -252,6 +252,6 @@ def collect_boxes_in_frames():
 
 if __name__ == '__main__':
     # collect_boxes_in_frames()
-    track_faces(500)
-    imwrite_output(500)
+    track_faces(100)
+    imwrite_output(100)
 

@@ -6,6 +6,7 @@ import imutils
 from os import listdir
 from os.path import isfile, join
 from cnn_class import Classifier
+from math import ceil
 
 font = cv2.FONT_HERSHEY_SIMPLEX
 bottomLeftCornerOfText = (10,500)
@@ -31,6 +32,25 @@ def rect_to_bb(rect):
 def get_pts_in_box(box):
     return (box[0], box[1]), (box[0] + box[2], box[1] + box[3])
 
+def rects_overlap(rect1, rect2):
+    cent1x = rect1[0]+float(rect1[2])/2
+    cent1y = rect1[1]+float(rect1[3])/2
+    cent2x = rect2[0]+float(rect2[2])/2
+    cent2y = rect2[1]+float(rect2[3])/2
+    if abs(cent1x-cent2x) < float(rect1[2])/2 or \
+            abs(cent1y-cent2y) < float(rect2[3])/2:
+        return True
+    else:
+        return False
+
+
+def scale_rect(rect, scale):
+    # print(rect)
+    border = int(ceil(rect[3]*(scale-1)))
+    # print(border)
+    new_rect = [rect[0]-border, rect[1]-border, rect[2]+2*border, rect[3]+2*border]
+    # print(new_rect)
+    return new_rect
 
 ap = argparse.ArgumentParser()
 #ap.add_argument("-i", "--image", required=True,
@@ -62,7 +82,7 @@ for imfile in onlyimages:
     # image
     # cv2.imshow("Input", image)
     # rects = detector(gray, 2)
-    rects = face_cascade.detectMultiScale(gray,
+    front_faces = face_cascade.detectMultiScale(gray,
             scaleFactor=1.1,
             minNeighbors=5,
             minSize=(10, 10),
@@ -71,7 +91,23 @@ for imfile in onlyimages:
                 cv2.CASCADE_FIND_BIGGEST_OBJECT +
                 cv2.CASCADE_DO_ROUGH_SEARCH))
 
-    for idx, rect in enumerate(rects):
+    front_faces = [scale_rect(f, 1.2) for f in front_faces]
+
+    profile_faces = profile_cascade.detectMultiScale(gray,
+            scaleFactor=1.1,
+            minNeighbors=5,
+            minSize=(10, 10),
+            flags = (cv2.CASCADE_SCALE_IMAGE +
+                cv2.CASCADE_DO_CANNY_PRUNING +
+                cv2.CASCADE_FIND_BIGGEST_OBJECT +
+                cv2.CASCADE_DO_ROUGH_SEARCH))
+
+    profile_faces = [scale_rect(p, 1.2) for p in profile_faces]
+
+    for f in front_faces:
+        profile_faces = [p for p in profile_faces if not rects_overlap(f,p)]
+
+    for idx, rect in enumerate(front_faces):
         # extract the ROI of the *original* face, then align the face
         # using facial landmarks
         # (x, y, w, h) = rect_to_bb(rect)
@@ -81,24 +117,16 @@ for imfile in onlyimages:
         h = rect[3]
         face = image[y:y + h, x:x + w]
         (label, score) = cnn_classifier.run_data(face)
-        print(label, score)
+        # print(label, score)
         cv2.imshow('image', image)
         cv2.imshow('face', face)
         [this_pt1, this_pt2] = get_pts_in_box((x, y, w, h))
-        cv2.rectangle(image, this_pt1, this_pt2, (128,0,0))
+        cv2.rectangle(image, this_pt1, this_pt2, (0,0,128))
         cv2.putText(image, label, this_pt1, font, fontScale,
-                (128,0,0), lineType)
+                (0,0,128), lineType)
 
-    rects = profile_cascade.detectMultiScale(gray,
-            scaleFactor=1.1,
-            minNeighbors=5,
-            minSize=(10, 10),
-            flags = (cv2.CASCADE_SCALE_IMAGE +
-                cv2.CASCADE_DO_CANNY_PRUNING +
-                cv2.CASCADE_FIND_BIGGEST_OBJECT +
-                cv2.CASCADE_DO_ROUGH_SEARCH))
 
-    for idx, rect in enumerate(rects):
+    for idx, rect in enumerate(profile_faces):
         # extract the ROI of the *original* face, then align the face
         # using facial landmarks
         # (x, y, w, h) = rect_to_bb(rect)
@@ -108,7 +136,7 @@ for imfile in onlyimages:
         h = rect[3]
         face = image[y:y + h, x:x + w]
         (label, score) = cnn_classifier.run_data(face)
-        print(label, score)
+        # print(label, score)
         cv2.imshow('image', image)
         cv2.imshow('face', face)
         [this_pt1, this_pt2] = get_pts_in_box((x, y, w, h))
@@ -119,3 +147,4 @@ for imfile in onlyimages:
 
     cv2.imshow('image', image)
     cv2.waitKey(0)
+

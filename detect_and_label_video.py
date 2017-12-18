@@ -78,7 +78,7 @@ if not ok:
     print 'Cannot read video file'
     sys.exit()
 
-onlyimages = [f for f in listdir(mydir) if isfile(join(mydir, f))]
+cur_frame = 0
 while True:
     # Read a new frame
     ok, frame = video.read()
@@ -129,8 +129,8 @@ while True:
         face = image[y:y + h, x:x + w]
         (label, score) = cnn_classifier.run_data(face)
         # print(label, score)
-        cv2.imshow('image', image)
-        cv2.imshow('face', face)
+        # cv2.imshow('image', image)
+        # cv2.imshow('face', face)
         [this_pt1, this_pt2] = get_pts_in_box((x, y, w, h))
         cv2.rectangle(image, this_pt1, this_pt2, (0,0,128))
         cv2.putText(image, label, this_pt1, font, fontScale,
@@ -148,14 +148,19 @@ while True:
         face = image[y:y + h, x:x + w]
         (label, score) = cnn_classifier.run_data(face)
         # print(label, score)
-        cv2.imshow('image', image)
-        cv2.imshow('face', face)
+        # cv2.imshow('image', image)
+        # cv2.imshow('face', face)
         [this_pt1, this_pt2] = get_pts_in_box((x, y, w, h))
         cv2.rectangle(image, this_pt1, this_pt2, (0,128,0))
         cv2.putText(image, label, this_pt1, font, fontScale,
                 (0,128,0), lineType)
 
 
-    cv2.imshow('image', image)
-    cv2.waitKey(0)
+    # cv2.imshow('image', image)
+    # cv2.waitKey(0)
+    print('saving', cur_frame);
+    cv2.imwrite('/video_out/'+str(cur_frame)+'.jpg', image)
+    cur_frame += 1
+    if (cur_frame > 1000):
+        break
 

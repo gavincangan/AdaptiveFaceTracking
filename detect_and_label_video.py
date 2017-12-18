@@ -159,7 +159,7 @@ while True:
     # cv2.imshow('image', image)
     # cv2.waitKey(0)
     print('saving', cur_frame);
-    cv2.imwrite('/video_out/'+str(cur_frame)+'.jpg', image)
+    cv2.imwrite('video_out/'+str(cur_frame)+'.jpg', image)
     cur_frame += 1
     if (cur_frame > 1000):
         break

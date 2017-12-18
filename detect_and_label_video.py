@@ -7,6 +7,7 @@ from os import listdir
 from os.path import isfile, join
 from cnn_class import Classifier
 from math import ceil
+import sys
 
 font = cv2.FONT_HERSHEY_SIMPLEX
 bottomLeftCornerOfText = (10,500)
@@ -55,10 +56,6 @@ def scale_rect(rect, scale):
 ap = argparse.ArgumentParser()
 #ap.add_argument("-i", "--image", required=True,
 #	help="path to input image")
-ap.add_argument("-i", "--imdir", required=True,
-	help="path to input image")
-ap.add_argument("-d", "--dest", required=True,
-	help="path to save image")
 args = vars(ap.parse_args())
 
 model_file = "tf/tensorflow-for-poets-2/tf_files/retrained_graph.pb"
@@ -66,15 +63,29 @@ label_file = "tf/tensorflow-for-poets-2/tf_files/retrained_labels.txt"
 cnn_classifier = Classifier(model_file=model_file, label_file=label_file)
 detector = dlib.get_frontal_face_detector()
 
-mydir = args["imdir"]
-dest = args["dest"]
+
+# Read video
+video = cv2.VideoCapture("./TBBT_S10E16.mp4")
+
+# Exit if video not opened.
+if not video.isOpened():
+    print "Could not open video"
+    sys.exit()
+
+# Read first frame.
+ok, frame = video.read()
+if not ok:
+    print 'Cannot read video file'
+    sys.exit()
+
 onlyimages = [f for f in listdir(mydir) if isfile(join(mydir, f))]
-for imfile in onlyimages:
-    if mydir[-1] != '/':
-        mydir += '/'
-    if dest[-1] != '/':
-        dest += '/'
-    image = cv2.imread(mydir+imfile)
+while True:
+    # Read a new frame
+    ok, frame = video.read()
+    if not ok:
+        break
+
+    image = frame
     image = imutils.resize(image, width=800)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
@@ -147,5 +158,4 @@ for imfile in onlyimages:
 
     cv2.imshow('image', image)
     cv2.waitKey(0)
-
 

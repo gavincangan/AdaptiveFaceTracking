@@ -10,8 +10,8 @@ from cnn_class import Classifier
 # home_folder = '/home/gavincangan/computerVision/AdaptiveFaceTracking/'
 home_folder = './'
 
-model_file = "tf/tensorflow-for-poets-2/tf_files/retrained_graph.pb"
-label_file = "tf/tensorflow-for-poets-2/tf_files/retrained_labels.txt"
+model_file = "tf/tensorflow/tf_files/retrained_graph.pb"
+label_file = "tf/tensorflow/tf_files/retrained_labels.txt"
 cnn_classifier = Classifier(model_file=model_file, label_file=label_file)
 
 box_in_frame_file = home_folder + 'box_in_frame.pick'

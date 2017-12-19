@@ -68,8 +68,8 @@ ap = argparse.ArgumentParser()
 #	help="path to input image")
 args = vars(ap.parse_args())
 
-model_file = "tf/tensorflow-for-poets-2/tf_files/retrained_graph.pb"
-label_file = "tf/tensorflow-for-poets-2/tf_files/retrained_labels.txt"
+model_file = "tf/tensorflow/tf_files/retrained_graph.pb"
+label_file = "tf/tensorflow/tf_files/retrained_labels.txt"
 cnn_classifier = Classifier(model_file=model_file, label_file=label_file)
 detector = dlib.get_frontal_face_detector()
 

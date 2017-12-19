@@ -72,8 +72,11 @@ args = vars(ap.parse_args())
 
 # initialize dlib's face detector (HOG-based) and then create
 # the facial landmark predictor and the face aligner
-detector = dlib.get_frontal_face_detector()
-predictor = dlib.shape_predictor(args["shape_predictor"])
+# detector = dlib.get_frontal_face_detector()
+# predictor = dlib.shape_predictor(args["shape_predictor"])
+face_cascade = cv2.CascadeClassifier('data/haarcascade_frontalface_alt2.xml')
+profile_cascade = cv2.CascadeClassifier('data/haarcascade_profileface.xml')
+
 fa = FaceAligner(predictor, desiredFaceWidth=256)
 mydir = args["imdir"]
 dest = args["dest"]

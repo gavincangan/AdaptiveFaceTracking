@@ -1,7 +1,9 @@
 # AdaptiveFaceTracking
 
 Computer vision project attempting to discover and track faces in unconstrained video.
-As of right now face detection is the limiting facot 
+https://sites.google.com/vt.edu/adaptivefacetracking/home
+
+As of right now face detection is the limiting factor 
 
 ###Training Tf Models
 
